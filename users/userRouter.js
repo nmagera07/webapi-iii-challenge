@@ -3,10 +3,10 @@ const express = 'express';
 const router = require('express').Router();
 
 const Users = require('./userDb')
-const Posts = require('../posts/postDb')
 
 
-router.post('/users', (req, res) => {
+
+router.post('/', (req, res) => {
     const userInfo = req.body
     Users.insert(userInfo)
         .then(post => {
@@ -18,7 +18,15 @@ router.post('/users', (req, res) => {
 });
 
 router.post('/:id/posts', (req, res) => {
-
+    const { id } = req.params
+    const postInfo = req.body
+    Users.insert({ text: req.body.text, post_id: id})
+        .then(post => {
+            res.status(201).json(post)
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'Cannot add post, sorry.'})
+        })
 });
 
 router.get('/', (req, res) => {
@@ -43,16 +51,19 @@ router.get('/:id', (req, res) => {
 });
 
 router.get('/:id/posts', (req, res) => {
-    const {id} = req.params
-    Posts.get(id)
-    
-                .then(post => {
-                    res.status(200).json(post)
-                })
-                .catch(error => {
-                    res.status(500).json({ error: 'Could not find post.'})
-                })
-       
+    const { id } = req.params
+    if (id) {
+        Users.getUserPosts(id)
+            .then(post => {
+                res.status(200).json(post)
+            })
+            .catch(error => {
+                res.status(500)
+            })
+    }
+    else {
+        res.status(404).json({ error: 'errors'})
+    }
 });
 
 router.delete('/:id', (req, res) => {
@@ -89,7 +100,13 @@ function validateUser(req, res, next) {
 };
 
 function validatePost(req, res, next) {
-
+    const body = req.body
+    if (!body) {
+        res.status(400).json({ message: 'missing post data.'})
+    } 
+    if (!body.text) {
+        res.status(400).json({ message: 'missing required text field.'})
+    }
 };
 
 module.exports = router;
