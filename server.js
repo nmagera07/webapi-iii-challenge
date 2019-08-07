@@ -12,4 +12,8 @@ function logger(req, res, next) {
 
 };
 
+server.listen(8009, () => {
+  console.log('api up on the port')
+})
+
 module.exports = server;
