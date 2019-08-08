@@ -3,8 +3,8 @@ const server = require('./server')
 
 
 
+const port = 8009
 
-
-server.listen(8009, () => {
-    console.log('api running on the port')
+server.listen(port, () => {
+    console.log(`api running on port ${port}`)
 })
